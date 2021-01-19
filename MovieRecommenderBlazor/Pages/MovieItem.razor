@@ -1,0 +1,34 @@
+﻿@inject MovieService _movieService
+@inject PredictionService _predictionService
+
+<tr>
+    <td>@movie.Id</td>
+    <td>@movie.Title</td>
+    <td>@movie.Genre</td>
+    <td>@if (predictionScore != 0) @predictionScore</td>
+    <td>
+        <button type="button" @onclick="PredictScore" class="btn btn-outline-success">Predict</button>
+    </td>
+</tr>
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    [Parameter]
+    public int MovieId { get; set; }
+
+    private Movie movie;
+    private float predictionScore;
+
+    protected override async Task OnInitializedAsync()
+    {
+        movie = _movieService.Movies.FirstOrDefault(movie => movie.Id == MovieId);
+    }
+
+    private void PredictScore()
+    {
+        var results = _predictionService.PredictMovie(MovieId, UserId);
+        predictionScore = (results / 5) * 100;
+    }
+}

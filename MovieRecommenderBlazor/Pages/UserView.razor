@@ -1,0 +1,68 @@
+﻿@page "/userview/{UserIdInString}"
+@inject UserService _userService
+@inject PredictionService _predictionService
+@inject MovieService _movieService
+
+<h1>@user.Name</h1>
+
+<div style="padding:10px"></div>
+
+<h4>Movies Already Watched By The User</h4>
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Genre</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var movie in user.Movies)
+        {
+            <tr>
+                <td>@movie.Id</td>
+                <td>@movie.Title</td>
+                <td>@movie.Genre</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div style="padding:10px"></div>
+
+<h4>Movies to Predict</h4>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Genre</th>
+            <th>Prediction Score</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var movie in moviesToPredict)
+        {
+            <MovieItem UserId="@UserId" MovieId="@movie.Id"></MovieItem>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public string UserIdInString { get; set; }
+
+    private int UserId;
+    private User user;
+    private List<Movie> moviesToPredict;
+    private int movieToPredictId;
+    private float predictedPercentage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        UserId = int.Parse(UserIdInString);
+        user = _userService.Users.FirstOrDefault(user => user.Id == UserId);
+        moviesToPredict = _predictionService.MoviesToPredict;
+    }
+}
